@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -20,7 +21,7 @@ public class KumoGeneratorOutputWordCloud {
 	
 	private static final Random RANDOM = new Random();
 		
-	public static void kumoGenerateOutputWordCloud(String fileWordCloudToWrite) throws IOException{
+	public static void kumoGenerateOutputWordCloud(String fileWordCloudToWrite, HalsteadMetricsBean halstedMetrics) throws IOException{
 	    final FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
 	    frequencyAnalyzer.setWordFrequenciesToReturn(600);
 	    frequencyAnalyzer.setMinWordLength(5);
@@ -37,7 +38,8 @@ public class KumoGeneratorOutputWordCloud {
 	    
 	    wordCloud.setFontScalar(new LinearFontScalar(8, 130));
 	    
-	    wordCloud.build(buildWordFrequencies());
+	    //wordCloud.build(buildWordFrequencies());
+	    wordCloud.build(buildWordFrequenciesByHashMap(halstedMetrics.getHalsteadWordFrecuency()));
 	    
 	    //wordCloud.writeToFile("C:\\Users\\Usuario\\Desktop\\wordcloud_match_online_example.png");
 	    wordCloud.writeToFile(fileWordCloudToWrite);
@@ -55,14 +57,16 @@ public class KumoGeneratorOutputWordCloud {
         final List<WordFrequency> wordFrequencies = new ArrayList<>();
         for (final String emoji : EMOJIS) {
             wordFrequencies.add(new WordFrequency(emoji, RANDOM.nextInt(250)));
-        	/*
-        	if(emoji.compareTo("Longitud")==0)
-        		wordFrequencies.add(new WordFrequency(emoji, 250));
-        	else
-        		wordFrequencies.add(new WordFrequency(emoji, 1));
-        	*/
         }
         return wordFrequencies;
+    }
+    
+    private static List<WordFrequency> buildWordFrequenciesByHashMap(HashMap<String, Integer> wordFrecuencies){
+    	final List<WordFrequency> wordFrequencies = new ArrayList<>();
+    	for (String key : wordFrecuencies.keySet()) {
+    		wordFrequencies.add(new WordFrequency(key, wordFrecuencies.get(key)));
+    	}
+    	return wordFrequencies;
     }
     
     private static final String[] EMOJIS = {
